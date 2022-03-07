@@ -1,0 +1,32 @@
+plugins {
+  id 'application'
+  id 'com.adarshr.test-logger' version '2.1.1'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+application {
+  mainClass = 'exercise.App'
+}
+
+dependencies {
+  implementation 'ch.qos.logback:logback-classic:1.2.11'
+  //ZooKeeper & Curator
+  implementation 'org.apache.curator:curator-framework:5.2.0'
+  implementation 'org.apache.curator:curator-recipes:5.2.0'
+
+
+//  runtimeOnly 'org.postgresql:postgresql:42.2.1'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0-M1'
+  testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.0-M1'
+  testImplementation 'org.assertj:assertj-core:3.19.0'
+}
+
+test {
+  useJUnitPlatform()
+}
