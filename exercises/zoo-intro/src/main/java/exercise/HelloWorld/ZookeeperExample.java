@@ -22,6 +22,7 @@ public class ZookeeperExample {
                 , watcherEvent -> System.out.println(">>>>>>>>" + watcherEvent.getState()));
         Thread.sleep(1000);
 
+        // в конкурентной среде код может не сработать, т.к. между проверкой и созданием может влезть другой процесс
         if (zkClient.exists(NODE_NAME, null) == null) {
             zkClient.create(NODE_NAME, "summer".getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
         }

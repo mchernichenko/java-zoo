@@ -8,25 +8,27 @@ import org.slf4j.LoggerFactory;
 
 public class ZookeeperInit {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZookeeperInit.class);
+    public static final String HOST = "localhost:2181";
 
     private static CuratorFramework curatorFrameworkClient;
 
     public static void init() {
         curatorFrameworkClient = CuratorFrameworkFactory.builder()
-                .connectString("localhost:2181")
+                .connectString(HOST)
                 .retryPolicy(new RetryNTimes(3, 1000))
                 .sessionTimeoutMs(10000)
                 .connectionTimeoutMs(1000)
                 .build();
         curatorFrameworkClient.start();
-        //block thread until zk connection is established
 
+        // блокируемся, пока не будет установлен коннект к zoo или не истечёт таймаут
         try {
             curatorFrameworkClient.getZookeeperClient().blockUntilConnectedOrTimedOut();
         } catch (InterruptedException e) {
-            throw  new IllegalStateException(e);
+            throw new IllegalStateException(e);
         }
-        //manually check connection status, cause CuratorFramework does not throw any exception
+
+        // manually check connection status, cause CuratorFramework does not throw any exception
         if (!curatorFrameworkClient.getZookeeperClient().isConnected()) {
             throw new IllegalStateException("Can't connect to Zookeeper");
         }

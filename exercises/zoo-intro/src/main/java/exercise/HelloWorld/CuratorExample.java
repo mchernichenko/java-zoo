@@ -18,21 +18,29 @@ public class CuratorExample {
 
     public static void main(String[] args) throws Exception {
         CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
-                .retryPolicy(new RetryOneTime(1000))
+                // стратегия подключения
+                .retryPolicy(new RetryOneTime(1000)) // пытаемся подключиться в течение 1 сек.
+                //.retryPolicy(new RetryNTimes(100, 3)) // пытаемся подключиться 3 раза с перерывом 0.1 сек.
                 .connectString(HOST)
                 .build();
 
         curatorFramework.start();
-        curatorFramework.blockUntilConnected(); // блокируемся, пока не будет установлен коннект к zoo
+        // блокируемся до тех пор, пока не будет доступно подключение к ZooKeeper. Cогласно retryPolicy это может занять
+        // некоторое время. В нашем примере, попытка подключения может затянуться до 1 сек.
+        curatorFramework.blockUntilConnected();
 
+        // создание ноды
         try {
             curatorFramework.create().forPath(NODE_NAME);
-        } catch (KeeperException e) {
-            logger.warn("Create node: " + e.getMessage());
+        } catch (KeeperException e) {  // eсли нода существует, то ошибка
+            logger.warn("Create node: {}", e.getMessage());
         }
 
+        // установка значения ноды
         curatorFramework.setData().forPath(NODE_NAME, "value".getBytes());
+        // чтение ноды
         curatorFramework.getData().forPath(NODE_NAME);
+        // чтение всех дочерних нод
         List<String> zkNodes = curatorFramework.getChildren().forPath("/");
         System.out.println(zkNodes);
     }

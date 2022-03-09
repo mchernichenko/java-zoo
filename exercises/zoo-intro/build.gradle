@@ -11,14 +11,18 @@ repositories {
 }
 
 application {
-  mainClass = 'exercise.App'
+  mainClass = 'exercise.recipes.GroupMemberRecipe'
 }
 
 dependencies {
+  // logback
   implementation 'ch.qos.logback:logback-classic:1.2.11'
+  implementation 'ch.qos.logback:logback-core:1.2.11'
+  implementation 'org.slf4j:slf4j-api:1.7.36'
+
   //ZooKeeper & Curator
-  implementation 'org.apache.curator:curator-framework:5.2.0'
-  implementation 'org.apache.curator:curator-recipes:5.2.0'
+  implementation 'org.apache.curator:curator-framework:2.12.0' // c zookeeper v.3.5.9 корректно работает curator 2.12
+  implementation 'org.apache.curator:curator-recipes:2.12.0'
 
 
 //  runtimeOnly 'org.postgresql:postgresql:42.2.1'

@@ -3,7 +3,12 @@
 ## Ссылки
 
 * [Библиотека для работы Zookeeper - Apache Curator](https://curator.apache.org/)
-* [Zoo java API](https://www.baeldung.com/java-zookeeper)
+* [Zoo java API (baeldung)](https://www.baeldung.com/java-zookeeper)
+* [Introduction to Apache Curator (baeldung)](https://www.baeldung.com/apache-curator)
+* [Примеры использования Apache Curator](https://programmersought.com/article/9457246297/)
+* [Ещё примеры Apache Curator](https://www.programcreek.com/java-api-examples/?api=org.apache.curator.framework.CuratorFramework)
+* [Ещё примеры Apache Curator](https://java.hotexamples.com/examples/org.apache.curator.framework/CuratorFrameworkFactory/builder/java-curatorframeworkfactory-builder-method-examples.html)
+* [Готовые кейсы Apache Curator (Recipes)](https://curator.apache.org/curator-recipes/index.html)
 
 Apache Zookeeper - сервис координации и синхронизации для распределённых приложений.
 Его можно рассматривать как key-value хранилище
@@ -43,9 +48,51 @@ API Zoo:
 * sync - синхронизация с мастером
 
 ### src\main\java\exercise\HelloWorld\ZookeeperExample.java
-Пример Zookeeper Java API 
+Пример Zookeeper Java API для создания, чтения нод и пр.
 
 ### src\main\java\exercise\HelloWorld\CuratorExample.java
-Пример с использованием curator - более удобной обёртки к Zookeeper Java API 
+Простой пример создания, чтения нод с использованием curator - более удобной обёртки к Zookeeper Java API 
+
+# Эфемерные ноды
+* Существуют пока есть активная сессия
+* Не могут иметь потомков
+```
+curatorClient.create().withMode(CreateMode.EFEMERAL_SEQUENTAL).forPath("/app");
+```
+Реализуется это просто. Zookeeper клиент каждые несколько секунд шлёт Heartbeat серверу. 
+Если сервер не получил запрос Heartbeat через определённое время он удаляет соединение и удаляет все эфемерные ноды связанные с клиентом,
+а также рассылает остальным клиентам коллбэки
+
+# Watcher
+Представляет собой **разовый** колбэк, который будет вызван, если произойдут следующие события:
+* getData()
+* getChildren()
+* exists()
+
+Пример подписки на узел */app_status*. Если он создаётся или удаляется, по прилетает событие NodeCreated 
+```
+curatorClient.cherkExists().usingWatcher(new CuratorWatcher() {
+    @Override
+    public void proccess(WatcherEvent event) throws Exception {
+        System.out.println(event);
+    }
+  }).forPath("/app_status");   
+)
+```
+Watcher не потеряется, если моргнёт сеть. Сервер должен получить ответ от клиента, что сообщение получено, только после
+этого сервер обнуляет watcher
+
+# Общая конфигурация
+curator-recipes
+
+# Транзакции
+
+# Утилитные классы Curator`a
+
+# Тестирование
+TestingServer() - поднимает zk в тестах
+Требуется зависимость - 
+
+
 
 
