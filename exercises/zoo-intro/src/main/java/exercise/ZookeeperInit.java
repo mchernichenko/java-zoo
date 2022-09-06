@@ -19,6 +19,7 @@ public class ZookeeperInit {
                 .sessionTimeoutMs(10000)
                 .connectionTimeoutMs(1000)
                 .build();
+        // куратор запускается в отдельном процессе и при потере соединения будет пытаться сделать реконнект
         curatorFrameworkClient.start();
 
         // блокируемся, пока не будет установлен коннект к zoo или не истечёт таймаут

@@ -1,6 +1,8 @@
 plugins {
   id 'application'
+  id 'java'
   id 'com.adarshr.test-logger' version '2.1.1'
+  id 'distribution'
 }
 
 group 'org.example'
@@ -11,7 +13,9 @@ repositories {
 }
 
 application {
-  mainClass = 'exercise.recipes.GroupMemberRecipe'
+  //mainClass = 'exercise.recipes.GroupMemberRecipe'
+  //mainClass = 'exercise.recipes.TreeCacheRecipe'
+  mainClass = 'exercise.recipes.CachedNode'
 }
 
 dependencies {
@@ -24,6 +28,8 @@ dependencies {
   implementation 'org.apache.curator:curator-framework:2.12.0' // c zookeeper v.3.5.9 корректно работает curator 2.12
   implementation 'org.apache.curator:curator-recipes:2.12.0'
 
+  //compile fileTree(dir: 'libs', include: ['*.jar'])
+//  compile fileTree(dir: 'src/main/resources', include: ['*.xml'])
 
 //  runtimeOnly 'org.postgresql:postgresql:42.2.1'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0-M1'
@@ -34,3 +40,21 @@ dependencies {
 test {
   useJUnitPlatform()
 }
+
+tasks.startScripts {
+  doLast {
+    def scriptFile = file "${outputDir}/${applicationName}"
+    scriptFile.text = scriptFile.text.replace('CLASSPATH=$APP_HOME/lib', 'CLASSPATH=$APP_HOME/conf/:$APP_HOME/lib')
+  }
+}
+
+task copyResources(type: Copy) {
+  from 'src/main/resources'
+  into 'build/install/app/conf' // папка будет создана, если не существует
+}
+
+//copyResources.mustRunAfter(installDist)
+/*
+installDist.configure {
+  dependsOn copyResources
+}*/

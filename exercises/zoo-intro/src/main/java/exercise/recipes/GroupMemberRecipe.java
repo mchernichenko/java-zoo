@@ -6,6 +6,7 @@ import org.apache.curator.framework.recipes.nodes.GroupMember;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.util.UUID;
 
 // Организация списка участников на сервере. Curator предоставляет готовую реализацию этого сервиса 'GroupMember'
@@ -16,6 +17,8 @@ public class GroupMemberRecipe {
     private GroupMember group;
 
     public static void main(String[] args) throws Exception {
+   //    System.out.println("Текущая папка: " + Paths.get(".").toRealPath().toString());
+        LOGGER.info(">>>>> Текущая папка: {}", Paths.get(".").toRealPath().toString());
         new GroupMemberRecipe().start();
     }
 
@@ -33,14 +36,19 @@ public class GroupMemberRecipe {
         logMembers();
     }
 
+    // Инициализируем поток, который запускается при завершении JVM, т.е. когда завершается последний поток
+    // или пользователь прарывает выполнение по ^C
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
+                LOGGER.info("Running Shutdown Hook");
                 group.close();
             }
         });
     }
 
+    // в бесконечном цикле раз в 5 сек. проверяем текущее количество эфемерных нод в "/member" и
+    // и если оно изменилось, то логируем это событие
     private void logMembers() throws InterruptedException {
         int membershipSize = 0;
         for (;;) {
@@ -48,7 +56,7 @@ public class GroupMemberRecipe {
                 membershipSize = group.getCurrentMembers().size();
                 LOGGER.info("{} nodes, {}", membershipSize, group.getCurrentMembers().keySet());
             }
-            Thread.sleep(10);
+            Thread.sleep(5000);
         }
     }
 }

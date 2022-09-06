@@ -5,10 +5,10 @@ clean:
 	./gradlew clean
 
 install:
-	./gradlew clean install
+	./gradlew clean install copyResources
 
 run:
-	./build/install/app/bin/app
+	./build/install/app/bin/app classpath=/tmp/logback.xml
 
 test:
 	gradle test

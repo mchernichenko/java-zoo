@@ -29,7 +29,8 @@ public class ZookeeperExample {
 
         zkClient.setData(NODE_NAME, "winter1".getBytes(), zkClient.exists(NODE_NAME, true).getVersion());
 
-        zkClient.getData(NODE_NAME, false, null);
+        byte[] bytes = zkClient.getData(NODE_NAME, false, null);
+        System.out.println("Значение ноды: " + new String(bytes));
 
         List<String> zkNodes = zkClient.getChildren("/", true);
         System.out.println("Список всех нод в корне: " + zkNodes);

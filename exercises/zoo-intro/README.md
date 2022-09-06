@@ -3,12 +3,15 @@
 ## Ссылки
 
 * [Библиотека для работы Zookeeper - Apache Curator](https://curator.apache.org/)
+* [Видео на Youtube про Apache Zookeeper часть 1](https://www.youtube.com/watch?v=PgTpvzv8xp0) 
+* [Ссылка на GitHub](https://github.com/dshuplyakov/zk-experiments)
+* [!!! Примеры использования Apache Curator](https://programmersought.com/article/9457246297/)
+* [Готовые рецерты Apache Curator (Recipes)](https://curator.apache.org/curator-recipes/index.html)
+---
 * [Zoo java API (baeldung)](https://www.baeldung.com/java-zookeeper)
 * [Introduction to Apache Curator (baeldung)](https://www.baeldung.com/apache-curator)
-* [Примеры использования Apache Curator](https://programmersought.com/article/9457246297/)
 * [Ещё примеры Apache Curator](https://www.programcreek.com/java-api-examples/?api=org.apache.curator.framework.CuratorFramework)
 * [Ещё примеры Apache Curator](https://java.hotexamples.com/examples/org.apache.curator.framework/CuratorFrameworkFactory/builder/java-curatorframeworkfactory-builder-method-examples.html)
-* [Готовые кейсы Apache Curator (Recipes)](https://curator.apache.org/curator-recipes/index.html)
 
 Apache Zookeeper - сервис координации и синхронизации для распределённых приложений.
 Его можно рассматривать как key-value хранилище
@@ -64,28 +67,23 @@ curatorClient.create().withMode(CreateMode.EFEMERAL_SEQUENTAL).forPath("/app");
 а также рассылает остальным клиентам коллбэки
 
 # Watcher
-Представляет собой **разовый** колбэк, который будет вызван, если произойдут следующие события:
-* getData()
-* getChildren()
-* exists()
+Представляет собой колбэк, который будет вызван, если произойдут какие-то изменения на сервере ZK.
+Пример подписки на конкретный узел */cache* см. готовый рецепт от куратора **NodeCache**. Если нужно подписаться на изменения целого дерева, т.е.
+ноды и всех дочерних нод, то есть готовый рецепт **TreeCache**
 
-Пример подписки на узел */app_status*. Если он создаётся или удаляется, по прилетает событие NodeCreated 
-```
-curatorClient.cherkExists().usingWatcher(new CuratorWatcher() {
-    @Override
-    public void proccess(WatcherEvent event) throws Exception {
-        System.out.println(event);
-    }
-  }).forPath("/app_status");   
-)
-```
-Watcher не потеряется, если моргнёт сеть. Сервер должен получить ответ от клиента, что сообщение получено, только после
-этого сервер обнуляет watcher
+Watcher не потеряется, если моргнёт сеть или ZK перегрузится. Клиент куратора автоматически восстановит соединение с сервером ZK 
+и восстановит отслеживание. Watcher`ы они на клиенте, сервер про них ничего не знает. 
+При установлении TCP соединения клиента и сервера, при наступлении события на сервере, он отправляет
+это событие в TCP соединение и клиент уже его ловит и вызывает колбэк связанный с этим событием.
+По сути клиент получает все события от сервера и уже на клиенте идёт обработка этих событий и вызов колбэков.
+Аналогия с RMQ, когда идёт публикация сообщений в exchange, а далее клиенты подписываются на нужные им сообщения
 
 # Общая конфигурация
-curator-recipes
+Готовый рецепт **NodeCache** или **TreeCache** (реализуется посредством Watcher`ов)
 
 # Транзакции
+Позволяют сделать группу операций атомарно, т.к. например, в конкурентрой среде делать проверку на существование ноды,
+а затем её создавать может не прокатить, т.к. после проверки, кто-то её уже может создать.
 
 # Утилитные классы Curator`a
 
